@@ -4,39 +4,76 @@
 
 const div_container = document.querySelector(".container");
 
-const url = "https://jsonplaceholder.typicode.com/users/1";
+let users = []; // Массив объектов пользователей
+let currentId = 0; // Текущий id пользователя
 
-async function getDataUsers() {
+const url = "https://jsonplaceholder.typicode.com/users";
+
+async function fetchUsers() {
   try {
     const response = await fetch(url);
-    const data = await response.json();
-    console.log("Data: ", data);
-    renderUser(data);
+    users = await response.json();
+    renderUser(currentId);
   } catch (err) {
     alert(err);
   }
 }
 
-getDataUsers();
+fetchUsers();
 
-function renderUser(data) {
+function renderUser(id) {
   div_container.innerHTML = "";
 
+  if (id >= users.length) {
+    alert("Это был последний пользователь");
+    return;
+  }
+
+  const user = users[id];
+
   const div_card = document.createElement("div");
-  const h2_name = document.createElement("h2");
+  const h1_name = document.createElement("h1");
   const h2_username = document.createElement("h2");
   const p_info = document.createElement("p");
   const prevButton = document.createElement("button");
   const nextButton = document.createElement("button");
+  const updateButton = document.createElement("button");
+  const img = document.createElement("img");
 
   div_card.className = "card";
   prevButton.className = "prev";
   nextButton.className = "next";
+  updateButton.className = "update-btn";
 
-  h2_name.innerHTML = `Name: ${data.name}`;
-  h2_username.innerHTML = `Username: ${data.username}`;
-  p_info.innerHTML = `Email: ${data.email} Website: ${data.website}`;
+  h1_name.innerHTML = `Name: ${user.name}`;
+  h2_username.innerHTML = `Username: ${user.username}`;
+  p_info.innerHTML = `Email: ${user.email} Website: ${user.website}`;
+  prevButton.innerText = "<";
+  nextButton.innerText = ">";
+  img.src = "./w256h2561339195709Edit256x256.png";
 
+  updateButton.append(img);
   div_container.append(div_card);
-  div_card.append(h2_name, h2_username, p_info, prevButton, nextButton);
+  div_card.append(
+    h1_name,
+    h2_username,
+    p_info,
+    prevButton,
+    nextButton,
+    updateButton
+  );
+
+  nextButton.addEventListener("click", () => {
+    currentId++;
+    renderUser(currentId);
+  });
+
+  prevButton.addEventListener("click", () => {
+    if (currentId > 0) {
+      currentId--;
+      renderUser(currentId);
+    } else {
+      alert("Это был первый пользователь");
+    }
+  });
 }
